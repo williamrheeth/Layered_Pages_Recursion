@@ -46,6 +46,8 @@ void manage_board(string input_file, string output_file) {
                 input >> page_id >> page_x >> page_y >> page_width >> page_height >> page_content;
                 board.print_job(job_idx, job_type, page_id);
                 board.insert_page(page_x, page_y, page_width, page_height, page_id, page_content);      
+                board.print_board();
+                cout << "why";
                 break;
             case 'd':
                 //delete page

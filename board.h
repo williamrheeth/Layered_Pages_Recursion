@@ -1,9 +1,12 @@
 #include <fstream>
+#include <vector>
 
 #include "page.h"
 
+using std::cout;
 using std::endl;
 using std::ofstream;
+using std::vector;
 
 class Board {
     public:
@@ -14,17 +17,23 @@ class Board {
         void print_job(int job_idx, char job_type, int id);
 
         //job functions
-        void insert_page(int x, int y, int width, int height, int id, int content);
+        void insert_page(int x, int y, int width, int height, int id, char content);
         void delete_page(int id);
         void modify_content(int id, char content);
         void modify_position(int id, int x, int y);
+
+        vector<Page> vectorPages;
+        static void vectorAdd(Page page);
 
     private:
         int num_jobs, width, height; 
         ofstream& output; 
         char* board; 
+
+        static int pageCount;
 };
 
+int Board::pageCount = 0;
 
 Board::Board(int num_jobs, int width, int height, ofstream& output_stream): output(output_stream) {
     this->width = width;
@@ -83,12 +92,37 @@ void Board::print_job(int job_idx, char job_type, int id) {
 }
 
 
-void Board::insert_page(int x, int y, int width, int height, int id, int content) {
+void Board::insert_page(int x, int y, int width, int height, int id, char content) {
+    Page page(x,y,width,height,id,content); // Save the page to vector
+    vectorPages[pageCount++] = page;    // Save to vector by static int pageCount
 
+    for (int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
+            board[j*this->width+i] = content;
+        }
+    }
+    this->print_board();
 }
 
 void Board::delete_page(int id) {
-    
+    int i = pageCount;
+    while(vectorPages[i+1].getPageid() != id) {
+        for (int h = 0; h < vectorPages[i].getheight(); h++) {
+            for (int w = 0; w < vectorPages[i].getwidth(); w++) {
+                board[h*this->width+w] = ' ';
+            }
+        }
+        i--;
+    }
+    for(i += 2; i <= pageCount ; i++) {
+        int x = vectorPages[i].getx();
+        int y = vectorPages[i].gety();
+        int width = vectorPages[i].getwidth();
+        int height = vectorPages[i].getheight();
+        int id = vectorPages[i].getPageid();
+        char content = vectorPages[i].getcontent();
+        insert_page(x,y,width,height,id,content);
+    }
 }
 
 void Board::modify_content(int id, char content) {
