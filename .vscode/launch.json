@@ -9,7 +9,7 @@
       "stopAtEntry": false,
       "externalConsole": true,
       "cwd": "c:/Users/1/Desktop/Uni/23-1/Programming Methodology/Project_1",
-      "program": "c:/Users/1/Desktop/Uni/23-1/Programming Methodology/Project_1",
+      "program": "c:/Users/1/Desktop/Uni/23-1/Programming Methodology/Project_1/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

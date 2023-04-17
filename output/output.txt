@@ -1,0 +1,93 @@
+>> (1) Insert 8
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+|                                                                                                     | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c c c c c c                                                                                 | 
+|                                                                                                     | 
+|                                                                                                     | 
+|                                                                                                     | 
+|                                                                                                     | 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+>> (2) Insert 1
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+|                                                                                                     | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+>> (3) Insert 2
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+|                                                                                                     | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c x x x k k k k k                                                                                 | 
+| c c x x x k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+>> (4) Insert 32
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+|                                                                                                     | 
+| c c c c c c c c c c                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k l l l l l l l l l l                                                                     | 
+| c c c c c k l l l l l l l l l l                                                                     | 
+| c c c c c k l l l l l l l l l l                                                                     | 
+| c c c c c k l l l l l l l l l l                                                                     | 
+| c c x x x k l l l l l l l l l l                                                                     | 
+| c c x x x k l l l l l l l l l l                                                                     | 
+| c c c c c k l l l l l l l l l l                                                                     | 
+| c c c c c k l l l l l l l l l l                                                                     | 
+| c c c c c k l l l l l l l l l l                                                                     | 
+| c c c c c k l l l l l l l l l l                                                                     | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+| c c c c c k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+|           k k k k k                                                                                 | 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+>> (5) Delete 8

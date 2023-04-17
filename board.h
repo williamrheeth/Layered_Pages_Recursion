@@ -3,7 +3,6 @@
 
 #include "page.h"
 
-using std::cout;
 using std::endl;
 using std::ofstream;
 using std::vector;
@@ -93,15 +92,16 @@ void Board::print_job(int job_idx, char job_type, int id) {
 
 
 void Board::insert_page(int x, int y, int width, int height, int id, char content) {
-    Page page(x,y,width,height,id,content); // Save the page to vector
-    vectorPages[pageCount++] = page;    // Save to vector by static int pageCount
+    //Page page = Page(x,y,width,height,id,content); // Save the page to vector
+    //vectorPages[pageCount] = page;    // Save to vector by static int pageCount
 
-    for (int j = 0; j < height; j++) {
-        for (int i = 0; i < width; i++) {
+    for (int j = y; j < y+height; j++) {
+        for (int i = x; i < x+width; i++) {
             board[j*this->width+i] = content;
         }
     }
     this->print_board();
+    
 }
 
 void Board::delete_page(int id) {
