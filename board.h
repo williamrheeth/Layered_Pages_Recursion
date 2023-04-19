@@ -1,3 +1,4 @@
+#include <iostream>
 #include <fstream>
 #include <vector>
 
@@ -17,22 +18,18 @@ class Board {
 
         //job functions
         void insert_page(int x, int y, int width, int height, int id, char content);
+        void insert_page_again(int x, int y, int width, int height, int id, char content);
         void delete_page(int id);
         void modify_content(int id, char content);
         void modify_position(int id, int x, int y);
 
         vector<Page> vectorPages;
-        static void vectorAdd(Page page);
 
     private:
         int num_jobs, width, height; 
         ofstream& output; 
         char* board; 
-
-        static int pageCount;
 };
-
-int Board::pageCount = 0;
 
 Board::Board(int num_jobs, int width, int height, ofstream& output_stream): output(output_stream) {
     this->width = width;
@@ -92,36 +89,57 @@ void Board::print_job(int job_idx, char job_type, int id) {
 
 
 void Board::insert_page(int x, int y, int width, int height, int id, char content) {
-    //Page page = Page(x,y,width,height,id,content); // Save the page to vector
-    //vectorPages[pageCount] = page;    // Save to vector by static int pageCount
+    Page page = Page(x,y,width,height,id,content); // Save the page to vector
+    vectorPages.push_back(page);    // Add to vector
 
-    for (int j = y; j < y+height; j++) {
-        for (int i = x; i < x+width; i++) {
-            board[j*this->width+i] = content;
+    for (int h = y; h < y+height; h++) {
+        for (int w = x; w < x+width; w++) {
+            board[h*this->width+w] = content;
         }
     }
     this->print_board();
-    
+}
+
+void Board::insert_page_again(int x, int y, int width, int height, int id, char content) {
+    for (int h = y; h < y+height; h++) {
+        for (int w = x; w < x+width; w++) {
+            board[h*this->width+w] = content;
+        }
+    }
+    this->print_board();
 }
 
 void Board::delete_page(int id) {
-    int i = pageCount;
-    while(vectorPages[i+1].getPageid() != id) {
-        for (int h = 0; h < vectorPages[i].getheight(); h++) {
-            for (int w = 0; w < vectorPages[i].getwidth(); w++) {
+    int i = vectorPages.size();
+
+    // Delete pages above
+    while(vectorPages[i-1].getPageid() != id) {
+        for (int h = vectorPages[i-1].gety(); h < vectorPages[i-1].gety() + vectorPages[i-1].getheight(); h++) {
+            for (int w = vectorPages[i-1].getx(); w < vectorPages[i-1].getx() + vectorPages[i-1].getwidth(); w++) {
                 board[h*this->width+w] = ' ';
             }
         }
+        this->print_board();
         i--;
     }
-    for(i += 2; i <= pageCount ; i++) {
+
+    // Delete the certain page
+    for (int h = vectorPages[i-1].gety(); h < vectorPages[i-1].gety() + vectorPages[i-1].getheight(); h++) {
+        for (int w = vectorPages[i-1].getx(); w < vectorPages[i-1].getx() + vectorPages[i-1].getwidth(); w++) {
+            board[h*this->width+w] = ' ';
+        }
+    }
+    this->print_board();
+
+    // Restore the pages above
+    for(; i < vectorPages.size() ; i++) {
         int x = vectorPages[i].getx();
         int y = vectorPages[i].gety();
         int width = vectorPages[i].getwidth();
         int height = vectorPages[i].getheight();
         int id = vectorPages[i].getPageid();
         char content = vectorPages[i].getcontent();
-        insert_page(x,y,width,height,id,content);
+        insert_page_again(x,y,width,height,id,content);
     }
 }
 
