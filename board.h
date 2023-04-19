@@ -142,21 +142,22 @@ void Board::delete_page(int id) {
     this->print_board();
 
     // Restore the pages above
-    for(; i < vectorPages.size() ; i++) {
-        int x = vectorPages[i].getx();
-        int y = vectorPages[i].gety();
-        int width = vectorPages[i].getwidth();
-        int height = vectorPages[i].getheight();
-        int id = vectorPages[i].getPageid();
-        char content = vectorPages[i].getcontent();
-        insert_page_again(x,y,width,height,id,content);
+    for(int k = 0; k < vectorPages.size() ; k++) {
+        if (k!=i-1) {
+            int x = vectorPages[k].getx();
+            int y = vectorPages[k].gety();
+            int width = vectorPages[k].getwidth();
+            int height = vectorPages[k].getheight();
+            int id = vectorPages[k].getPageid();
+            char content = vectorPages[k].getcontent();
+            insert_page_again(x,y,width,height,id,content);
+            this->print_board();
+        }
     }
-    this->print_board();
 }
 
 void Board::modify_content(int id, char content) {
    
-
 }
 void Board::modify_position(int id, int x, int y) {
    
