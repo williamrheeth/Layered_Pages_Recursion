@@ -1,4 +1,5 @@
 class Page {
+    friend class Board;
     public:
         Page(int x, int y, int width, int height, int id, char content);
         int getPageid();

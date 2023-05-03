@@ -21,25 +21,23 @@ class Board {
         void insert_page(int x, int y, int width, int height, int id, char content);
         void insert_page_again(int x, int y, int width, int height, int id, char content);
         void delete_page(int id);
+        void delete_recursion(int id, vector<int>& onTop);
         void modify_content(int id, char content);
         void modify_position(int id, int x, int y);
 
         vector<Page> vectorPages;
-        void pagesOnTop(int id);
-        bool isInArray(int k, vector<int> vect);
-        vector<int> checkOverlap(int pagenum);
-        void organizeOnTop(int id);
+        vector<int> pagesOnTop(int id);
+        vector<int> checkIfFull(vector<int> onTop);
+        void clear_board();
 
     private:
         int num_jobs, width, height; 
         ofstream& output; 
         char* board; 
-        static int pagesOnTopIndex;
-        static vector<int> indexVec;
+        static vector<int> indexvec;
 };
 
-int Board::pagesOnTopIndex = 0;
-vector<int> Board::indexVec = {};
+vector<int> Board::indexvec = {};
 
 Board::Board(int num_jobs, int width, int height, ofstream& output_stream): output(output_stream) {
     this->width = width;
@@ -58,7 +56,6 @@ Board::Board(int num_jobs, int width, int height, ofstream& output_stream): outp
 
 Board::~Board() {
     delete board;
-    
 }
 
 
@@ -119,99 +116,82 @@ void Board::insert_page_again(int x, int y, int width, int height, int id, char 
 }
 
 void Board::delete_page(int id) {
-    vector<int> onTop = {};
-    vector<int> notTop = {};
-    
-    pagesOnTop(id);
-    organizeOnTop(vectorPages[indexVec[0]].getPageid());
+    vector<int> onTop = pagesOnTop(id);
 
-
-
+    // Initialize this->indexvec which contains all the page numbers of vectorPages (like 0,1,2,3,...)
+    this->indexvec.clear();
+    for(int i = 0; i < vectorPages.size(); i++) {
+        this->indexvec.push_back(i);
+    }
+        
     // Find position of page of such id
     int pageNum = 0;
     while(vectorPages[pageNum].getPageid() != id) {
         pageNum++;
     }
 
-    // for(int i = 0; i < onTop.size(); i++){
-    //     if(pagesOnTop(onTop[i]).size() > 0) {
-    //         moveElementToFront(onTop,pagesOnTop(onTop[i])[0],i);
-    //     }
-    // }
+    delete_recursion(pageNum, onTop);
+}
 
-    // Delete pages above and rewrite one by one
-    for(int ind = 0; ind < onTop.size(); ind++) {
-        for (int h = vectorPages[onTop[ind]].gety(); h < vectorPages[onTop[ind]].gety() + vectorPages[onTop[ind]].getheight(); h++) {
-            for (int w = vectorPages[onTop[ind]].getx(); w < vectorPages[onTop[ind]].getx() + vectorPages[onTop[ind]].getwidth(); w++) {
-                board[h*this->width+w] = ' ';
+void Board::delete_recursion(int pagenum, vector<int>& onTop) {
+    while(this->indexvec.size() > vectorPages.size() - onTop.size()) {
+        vector<int> check = checkIfFull(onTop);
+        for(int i = 0; i < check.size(); i++) {
+            if(check.size() == 0 || check.size() == 1) {
+                // do nothing
+            } else if(i < check.size()-1 && vectorPages[check[i]].getPageid() > vectorPages[check[i+1]].getPageid()) {
+                int temp = check[i];
+                check[i] = check[i+1];
+                check[i+1] = temp;
+                // organize in ascending id order
             }
         }
-
-        // Make a vector for number of pages that are not on top and not the specific page
-        int val = 0;
-        for (int i = 0; i < vectorPages.size(); i++) {
-            while (std::find(onTop.begin(), onTop.begin()+ind+1, val) != onTop.begin()+ind+1) {
-                val++; // Increment val until it is not in onTop
+        for(int i = 0; i < check.size(); i++) {
+            vector<int>::iterator pos = std::find(this->indexvec.begin(), this->indexvec.end(), check[i]);
+            this->indexvec.erase(pos);
+            this->clear_board();
+            for(int i = 0; i < this->indexvec.size(); i++) {
+                int x = vectorPages[this->indexvec[i]].getx();
+                int y = vectorPages[this->indexvec[i]].gety();
+                int width = vectorPages[this->indexvec[i]].getwidth();
+                int height = vectorPages[this->indexvec[i]].getheight();
+                int id = vectorPages[this->indexvec[i]].getPageid();
+                char content = vectorPages[this->indexvec[i]].getcontent();
+                insert_page_again(x, y, width, height, id, content);
             }
-            if(val >= vectorPages.size()) {
-                i = vectorPages.size();
-            } 
-            // else if(val == pageNum) {
-            //     val++;
-            // } 
-            else {
-                notTop.push_back(val);
-                val++;
-            }
+            this->print_board();
         }
-
-        std::cout << "onTop: "<< endl;
-        for(int i = 0; i < onTop.size(); i++) {
-            std::cout << onTop[i] << endl;
-        }
-
         
-        for(int k = 0; k < vectorPages.size() ; k++) {
-            if(isInArray(k,notTop)) {
-                int x = vectorPages[k].getx();
-                int y = vectorPages[k].gety();
-                int width = vectorPages[k].getwidth();
-                int height = vectorPages[k].getheight();
-                int id = vectorPages[k].getPageid();
-                char content = vectorPages[k].getcontent();
-                insert_page_again(x,y,width,height,id,content);
-            }
+        delete_recursion(pagenum, onTop);
+
+        for(int i = check.size()-1; i >= 0; i--) {
+            int x = vectorPages[check[i]].getx();
+            int y = vectorPages[check[i]].gety();
+            int width = vectorPages[check[i]].getwidth();
+            int height = vectorPages[check[i]].getheight();
+            int id = vectorPages[check[i]].getPageid();
+            char content = vectorPages[check[i]].getcontent();
+            insert_page_again(x, y, width, height, id, content);
+            this->print_board();
+        }
+    }
+
+    if(this->indexvec.size() == vectorPages.size() - onTop.size()) {
+        vector<int>::iterator pos = std::find(this->indexvec.begin(), this->indexvec.end(), pagenum);
+        this->indexvec.erase(pos);
+        this->clear_board();
+        for(int i = 0; i < this->indexvec.size(); i++) {
+            int x = vectorPages[this->indexvec[i]].getx();
+            int y = vectorPages[this->indexvec[i]].gety();
+            int width = vectorPages[this->indexvec[i]].getwidth();
+            int height = vectorPages[this->indexvec[i]].getheight();
+            int id = vectorPages[this->indexvec[i]].getPageid();
+            char content = vectorPages[this->indexvec[i]].getcontent();
+            insert_page_again(x, y, width, height, id, content);
         }
         this->print_board();
-        notTop.clear();
-    }
 
-    // Delete the certain page
-    for (int h = vectorPages[pageNum].gety(); h < vectorPages[pageNum].gety() + vectorPages[pageNum].getheight(); h++) {
-        for (int w = vectorPages[pageNum].getx(); w < vectorPages[pageNum].getx() + vectorPages[pageNum].getwidth(); w++) {
-            board[h*this->width+w] = ' ';
-        }
-    }
-
-    this->print_board();
-
-    // Restore the pages above
-    int i = 1;
-    for(int k = 0; k < vectorPages.size() ; k++) {
-        if (k!=pageNum && isInArray(k,onTop)) {
-            int j = onTop[onTop.size()-i];
-
-            int x = vectorPages[j].getx();
-            int y = vectorPages[j].gety();
-            int width = vectorPages[j].getwidth();
-            int height = vectorPages[j].getheight();
-            int id = vectorPages[j].getPageid();
-            char content = vectorPages[j].getcontent();
-            insert_page_again(x,y,width,height,id,content);
-            this->print_board();
-
-            i++;
-        }
+        return;
     }
 }
 
@@ -223,7 +203,7 @@ void Board::modify_position(int id, int x, int y) {
     
 }
 
-void Board::pagesOnTop(int id) {
+vector<int> Board::pagesOnTop(int id) {
     int i = 0;
     // Find which page has such id
     while(vectorPages[i].getPageid() != id) {
@@ -234,59 +214,11 @@ void Board::pagesOnTop(int id) {
     int y = vectorPages[i].gety();
     int width = vectorPages[i].getwidth();
     int height = vectorPages[i].getheight();
-    int pushbackindex = 0;
 
+    vector<int> index = {};
     // Check if overlap
     for(int k = 0; k < vectorPages.size(); k++) {
         if(k!=i) {
-            if(vectorPages[k].getx()+vectorPages[k].getwidth() < x ||
-            vectorPages[k].getx() > x + width ||
-            vectorPages[k].gety() + vectorPages[k].getheight() < y ||
-            vectorPages[k].gety() > y + height) {
-                
-            } else {
-                indexVec.push_back(k);
-                pushbackindex++;
-            }
-        }
-    }
-
-    // Gives page numbers of vectorPages
-
-    // Organize with smallest id
-    for(int ind = pagesOnTopIndex; ind < pagesOnTopIndex + pushbackindex; ind++) {
-        if(vectorPages[indexVec[ind]].getPageid() > vectorPages[indexVec[ind+1]].getPageid() && ind+1<indexVec.size()) {
-            int temp = indexVec[ind];
-            indexVec[ind] = indexVec[ind+1];
-            indexVec[ind+1] = temp;
-        }
-    }
-
-    pagesOnTopIndex = pushbackindex;
-}
-
-void Board::organizeOnTop(int id) {
-    int i = 0;
-    while(vectorPages[i].getPageid() != id) {
-        i++;
-    }
-    if(!checkOverlap(i).empty()) {
-        int k = pagesOnTopIndex;
-        pagesOnTop(vectorPages[i].getPageid());
-        for(int l = k; l < pagesOnTopIndex; l++) {
-            organizeOnTop(vectorPages[l].getPageid());
-        }
-    }
-}
-
-vector<int> Board::checkOverlap(int pagenum) {
-    vector<int> index;
-    int x = vectorPages[pagenum].getx();
-    int y = vectorPages[pagenum].gety();
-    int width = vectorPages[pagenum].getwidth();
-    int height = vectorPages[pagenum].getheight();
-    for(int k = 0; k < vectorPages.size(); k++) {
-        if(k!=pagenum) {
             if(vectorPages[k].getx()+vectorPages[k].getwidth() < x ||
             vectorPages[k].getx() > x + width ||
             vectorPages[k].gety() + vectorPages[k].getheight() < y ||
@@ -301,12 +233,29 @@ vector<int> Board::checkOverlap(int pagenum) {
     return index;
 }
 
-bool Board::isInArray(int k, vector<int> vect) {
-    bool a = false;
-    for(int i = 0; i < vect.size(); i++) {
-        if(k == vect[i]) {
-            a = true;
+vector<int> Board::checkIfFull(vector<int> onTop) {
+    vector<int> checkIndex;
+    for(int i = 0; i < onTop.size(); i++){
+        if(std::count(this->indexvec.begin(), this->indexvec.end(), onTop[i])) { // See if ith onTop value (pagenumber) is in this->indexvec
+            bool isItFull = true;
+            for (int h = vectorPages[onTop[i]].gety() ; h < vectorPages[onTop[i]].gety()+vectorPages[onTop[i]].getheight(); h++) {
+                for (int w = vectorPages[onTop[i]].getx(); w < vectorPages[onTop[i]].getx()+vectorPages[onTop[i]].getwidth(); w++) {
+                    if(board[h*this->width+w] != vectorPages[onTop[i]].getcontent()) {
+                        isItFull = false;
+                    }
+                }
+            }
+            if(isItFull) {
+                checkIndex.push_back(onTop[i]);
+            }
         }
     }
-    return a;
+
+    return checkIndex;
+}
+
+void Board::clear_board() {
+    for(int i = 0; i < width*height; i++) {
+        this->board[i] = ' ';
+    }
 }
