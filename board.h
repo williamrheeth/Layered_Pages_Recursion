@@ -36,10 +36,12 @@ class Board {
         ofstream& output; 
         char* board; 
         static vector<int> indexvec;
+        static vector<int> indexvec2;
         static vector<int> onTop;
 };
 
 vector<int> Board::indexvec = {};
+vector<int> Board::indexvec2 = {};
 vector<int> Board::onTop = {};
 
 Board::Board(int num_jobs, int width, int height, ofstream& output_stream): output(output_stream) {
@@ -119,37 +121,42 @@ void Board::insert_page_again(int x, int y, int width, int height, int id, char 
 }
 
 void Board::delete_page(int id) {
-    onTop = pagesOnTop(id);
-    indexvec = onTop;
-        
+    for(int i = 0; i < vectorPages.size(); i++) {
+        indexvec.push_back(i);
+    }
+
+    this->onTop = pagesOnTop(id);
+    vector<int> index = onTop;
+     
     // Find position of page of such id
     int pageNum = 0;
     while(vectorPages[pageNum].getPageid() != id) {
         pageNum++;
     }
 
-    delete_recursion(pageNum, onTop);
+    this->delete_recursion(pageNum, index);
 }
 
 void Board::delete_recursion(int pagenum, vector<int>& index) {
-    
-    while(this->indexvec.size() > vectorPages.size() - this->onTop.size()) {
-
+    if(this->indexvec.size() > this->vectorPages.size() - this->onTop.size()) {
         for(int i = 0; i < index.size(); i++) {
             if(index.size() == 0 || index.size() == 1) {
                 // do nothing
             } else if(i < index.size()-1 && vectorPages[index[i]].getPageid() > vectorPages[index[i+1]].getPageid()) {
-                int temp = index[i];
-                index[i] = index[i+1];
-                index[i+1] = temp;
+                iter_swap(index.begin()+i, index.begin()+i+1);
                 // organize in ascending id order
             }
         }
 
-        for(int i = 0; i < index.size(); i++) {
+        for(int i = 0; i < index.size(); ) {
             if(boolCheckIfFull(index[i],index)) {
                 auto pos = std::find(this->indexvec.begin(), this->indexvec.end(), index[i]);
                 this->indexvec.erase(pos);
+
+                std::reverse(indexvec2.begin(), indexvec2.end());
+                indexvec2.push_back(index[i]);
+                std::reverse(indexvec2.begin(), indexvec2.end());
+
                 auto pos2 = std::find(index.begin(), index.end(), index[i]);
                 index.erase(pos2);
                 this->clear_board();
@@ -172,27 +179,44 @@ void Board::delete_recursion(int pagenum, vector<int>& index) {
                     onTop1[i+1] = temp;
                     // organize in ascending id order
                 }
+                int a = index[i];
                 for(int j = 0; j < onTop1.size(); j++) {
-                    delete_recursion(index[i], onTop1);
-                    vector<int>::iterator pos = std::find(this->indexvec.begin(), this->indexvec.end(), index[j]);
-                    this->indexvec.erase(pos);
-                    vector<int>::iterator pos2 = std::find(index.begin(), index.end(), index[j]);
-                    index.erase(pos2);
-                    for(int i = 0; i < this->indexvec.size(); i++) {
-                        int x = vectorPages[this->indexvec[j]].getx();
-                        int y = vectorPages[this->indexvec[j]].gety();
-                        int width = vectorPages[this->indexvec[j]].getwidth();
-                        int height = vectorPages[this->indexvec[j]].getheight();
-                        char content = vectorPages[this->indexvec[j]].getcontent();
-                        this->insert_page_again(x, y, width, height, this->indexvec[j], content);
+
+                    delete_recursion(onTop1[j], onTop1);
+
+                    std::reverse(indexvec2.begin(), indexvec2.end());
+                    indexvec2.push_back(index[i]);
+                    std::reverse(indexvec2.begin(), indexvec2.end());
+
+                    vector<int>::iterator pos = std::find(this->indexvec.begin(), this->indexvec.end(), a);
+                    if(pos != this->indexvec.end())
+                        this->indexvec.erase(pos);
+
+                    vector<int>::iterator pos2 = std::find(index.begin(), index.end(), a);
+                    if(pos2 != index.end())
+                        index.erase(pos2);
+
+                    vector<int>::iterator pos3 = std::find(index.begin(), index.end(), onTop1[j]);
+                    if(pos3 != index.end())
+                        index.erase(pos3);
+
+                    this->clear_board();
+                    for(int k = 0; k < this->indexvec.size(); k++) {
+                        int x = vectorPages[this->indexvec[k]].getx();
+                        int y = vectorPages[this->indexvec[k]].gety();
+                        int width = vectorPages[this->indexvec[k]].getwidth();
+                        int height = vectorPages[this->indexvec[k]].getheight();
+                        char content = vectorPages[this->indexvec[k]].getcontent();
+                        this->insert_page_again(x, y, width, height, this->indexvec[k], content);
                     }
                     this->print_board();
+                    
                 }
             }
         }
     }
 
-    if(this->indexvec.size() == vectorPages.size() - this->onTop.size()) {
+    if(this->indexvec.size() == this->vectorPages.size() - this->onTop.size()) {
         vector<int>::iterator pos3 = std::find(this->indexvec.begin(), this->indexvec.end(), pagenum);
         this->indexvec.erase(pos3);
         this->clear_board();
@@ -207,7 +231,16 @@ void Board::delete_recursion(int pagenum, vector<int>& index) {
         }
         this->print_board();
 
-        return;
+        for(int i = 0; i < this->indexvec2.size(); i++) {
+            int x = vectorPages[this->indexvec2[i]].getx();
+            int y = vectorPages[this->indexvec2[i]].gety();
+            int width = vectorPages[this->indexvec2[i]].getwidth();
+            int height = vectorPages[this->indexvec2[i]].getheight();
+            int id = vectorPages[this->indexvec2[i]].getPageid();
+            char content = vectorPages[this->indexvec2[i]].getcontent();
+            insert_page_again(x, y, width, height, id, content);
+            this->print_board();
+        }
     }
 }
 
@@ -233,16 +266,22 @@ vector<int> Board::pagesOnTop(int id) {
     vector<int> index = {};
     // Check if overlap
     for(int k = 0; k < vectorPages.size(); k++) {
-        if(k!=i) {
-            if(vectorPages[k].getx()+vectorPages[k].getwidth() < x ||
-            vectorPages[k].getx() > x + width ||
-            vectorPages[k].gety() + vectorPages[k].getheight() < y ||
-            vectorPages[k].gety() > y + height) {
+        if(std::find(indexvec.begin(), indexvec.end(), k) != indexvec.end() && std::find(indexvec.begin(), indexvec.end(), i) != indexvec.end())  {
+            if(k!=i) {
+                if(vectorPages[k].getx()+vectorPages[k].getwidth() <= x ||
+                vectorPages[k].getx() >= x + width ||
+                vectorPages[k].gety() + vectorPages[k].getheight() <= y ||
+                vectorPages[k].gety() >= y + height) {
                 
-            } else {
-                index.push_back(k);
+                } else {
+                    auto pos1 = std::find(indexvec.begin(), indexvec.end(), i);
+                    auto pos2 = std::find(indexvec.begin(), indexvec.end(), k);
+                    if(pos1 < pos2) {
+                        index.push_back(k);
+                    }
+                }
             }
-        }
+        } 
     }
 
     return index;
@@ -269,8 +308,8 @@ vector<int> Board::checkIfFull(vector<int> onTop) {
     return checkIndex;
 }
 
-bool Board::boolCheckIfFull(int pagenum, vector<int> onTop) {
-        if(std::count(onTop.begin(), onTop.end(), pagenum)) { // See if ith onTop value (pagenumber) is in this->onTop
+bool Board::boolCheckIfFull(int pagenum, vector<int> onTop1) {
+        if(std::count(this->indexvec.begin(), this->indexvec.end(), pagenum)) { // See if ith onTop value (pagenumber) is in this->onTop
             for (int h = vectorPages[pagenum].gety() ; h < vectorPages[pagenum].gety()+vectorPages[pagenum].getheight(); h++) {
                 for (int w = vectorPages[pagenum].getx(); w < vectorPages[pagenum].getx()+vectorPages[pagenum].getwidth(); w++) {
                     if(board[h*this->width+w] != vectorPages[pagenum].getcontent()) {
