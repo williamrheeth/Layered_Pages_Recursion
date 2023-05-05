@@ -121,6 +121,10 @@ void Board::insert_page_again(int x, int y, int width, int height, int id, char 
 }
 
 void Board::delete_page(int id) {
+    indexvec.clear();
+    indexvec2.clear();
+    onTop.clear();
+
     for(int i = 0; i < vectorPages.size(); i++) {
         indexvec.push_back(i);
     }
@@ -135,6 +139,9 @@ void Board::delete_page(int id) {
     }
 
     this->delete_recursion(pageNum, index);
+
+    auto iter = vectorPages.begin() + pageNum;
+    vectorPages.erase(iter);
 }
 
 void Board::delete_recursion(int pagenum, vector<int>& index) {
@@ -165,8 +172,9 @@ void Board::delete_recursion(int pagenum, vector<int>& index) {
                     int y = vectorPages[this->indexvec[j]].gety();
                     int width = vectorPages[this->indexvec[j]].getwidth();
                     int height = vectorPages[this->indexvec[j]].getheight();
+                    int id = vectorPages[this->indexvec[j]].getPageid();
                     char content = vectorPages[this->indexvec[j]].getcontent();
-                    this->insert_page_again(x, y, width, height, this->indexvec[j], content);
+                    this->insert_page_again(x, y, width, height, id, content);
                 }
                 this->print_board();
             } else {
@@ -206,8 +214,9 @@ void Board::delete_recursion(int pagenum, vector<int>& index) {
                         int y = vectorPages[this->indexvec[k]].gety();
                         int width = vectorPages[this->indexvec[k]].getwidth();
                         int height = vectorPages[this->indexvec[k]].getheight();
+                        int id = vectorPages[this->indexvec[k]].getPageid();
                         char content = vectorPages[this->indexvec[k]].getcontent();
-                        this->insert_page_again(x, y, width, height, this->indexvec[k], content);
+                        this->insert_page_again(x, y, width, height, id, content);
                     }
                     this->print_board();
                     
@@ -245,7 +254,45 @@ void Board::delete_recursion(int pagenum, vector<int>& index) {
 }
 
 void Board::modify_content(int id, char content) {
-   
+    indexvec.clear();
+    for(int i = 0; i < vectorPages.size(); i++) {
+        this->indexvec.push_back(i);
+    }
+
+    // Find position of page of such id
+    int pageNum = 0;
+    while(vectorPages[pageNum].getPageid() != id) {
+        pageNum++;
+    }
+
+    auto iter = indexvec.begin() + pageNum;
+    indexvec.erase(iter);
+
+    this->clear_board();
+    for(int k = 0; k < this->indexvec.size(); k++) {
+        int x = vectorPages[this->indexvec[k]].getx();
+        int y = vectorPages[this->indexvec[k]].gety();
+        int width = vectorPages[this->indexvec[k]].getwidth();
+        int height = vectorPages[this->indexvec[k]].getheight();
+        int id = vectorPages[this->indexvec[k]].getPageid();
+        char content = vectorPages[this->indexvec[k]].getcontent();
+        this->insert_page_again(x, y, width, height, id, content);
+    }
+    this->print_board();
+
+    vectorPages[pageNum].setcontent(content);
+
+    this->clear_board();
+    for(int k = 0; k < this->vectorPages.size(); k++) {
+        int x = vectorPages[k].getx();
+        int y = vectorPages[k].gety();
+        int width = vectorPages[k].getwidth();
+        int height = vectorPages[k].getheight();
+        int id = vectorPages[k].getPageid();
+        char content = vectorPages[k].getcontent();
+        this->insert_page_again(x, y, width, height, id, content);
+    }
+    this->print_board();
 }
 void Board::modify_position(int id, int x, int y) {
     
