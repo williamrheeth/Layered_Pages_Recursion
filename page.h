@@ -8,6 +8,9 @@ class Page {
         int getwidth();
         int getheight();
         char getcontent();
+        void setcontent(char newcontent);
+        void setx(int newx);
+        void sety(int newy);
     private:
         int x, y; // position of the page on the board
         int width, height; // width and height of the page 
@@ -46,4 +49,16 @@ int Page::getheight() {
 
 char Page::getcontent() {
     return this->content;
+}
+
+void Page::setcontent(char newcontent) {
+    this->content = newcontent;
+}
+
+void Page::setx(int newx) {
+    this->x = newx;
+}
+
+void Page::sety(int newy) {
+    this->y = newy;
 }
