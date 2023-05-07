@@ -90,7 +90,6 @@ int main(int argc, char *argv[]) {
 
     if (argc==3) manage_board(string(argv[1]), string(argv[2]));
     else cerr << "Wrong arguments" << endl;
-    
 
     return 0; 
 
